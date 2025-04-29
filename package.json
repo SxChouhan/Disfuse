@@ -1,0 +1,37 @@
+{
+  "name": "disfuse",
+  "version": "0.1.0",
+  "description": "A decentralized social media platform built on CoreDAO",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "contracts"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "npm run build:frontend && npm run build:contracts",
+    "build:frontend": "cd frontend && npm run build",
+    "build:contracts": "cd contracts && npx hardhat compile",
+    "deploy:contracts": "cd contracts && npx hardhat run scripts/deploy.js --network core",
+    "test": "npm run test:contracts",
+    "test:contracts": "cd contracts && npx hardhat test"
+  },
+  "keywords": [
+    "web3",
+    "blockchain",
+    "social-media",
+    "coredao",
+    "decentralized"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "react-router-dom": "^7.5.3"
+  }
+}
