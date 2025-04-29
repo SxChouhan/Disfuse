@@ -6,11 +6,6 @@ const Navigation: React.FC = () => {
   const { account, isConnected, connectWallet, disconnectWallet, loading, error, isCorrectChain, isMetaMaskInstalled } = useWeb3();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Format address for display
-  const formatAddress = (address: string) => {
-    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-  };
-
   // Toggle mobile menu
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -41,13 +36,11 @@ const Navigation: React.FC = () => {
                 </div>
               )}
 
-              <Link to="/create" className="btn-primary">
-                Create Post
-              </Link>
-
               <div className="relative group">
-                <Link to="/profile" className="btn-secondary">
-                  {formatAddress(account || '')}
+                <Link to="/profile" className="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-neonGreen">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
                 </Link>
 
                 <div className="absolute right-0 mt-2 w-48 bg-darkSecondary rounded-md shadow-lg py-1 hidden group-hover:block z-20">
@@ -78,9 +71,9 @@ const Navigation: React.FC = () => {
                 <button
                   onClick={connectWallet}
                   disabled={loading}
-                  className="btn-secondary"
+                  className="btn-primary"
                 >
-                  {loading ? 'Connecting...' : 'Connect Wallet'}
+                  {loading ? 'Connecting...' : 'Connect to MetaMask'}
                 </button>
               )}
             </>
@@ -100,19 +93,14 @@ const Navigation: React.FC = () => {
               )}
 
               <Link
-                to="/create"
-                className="btn-primary text-center"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Create Post
-              </Link>
-
-              <Link
                 to="/profile"
-                className="btn-secondary text-center"
+                className="flex items-center justify-center space-x-2 btn-secondary text-center"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                {formatAddress(account || '')}
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span>My Profile</span>
               </Link>
 
               <button
@@ -143,9 +131,9 @@ const Navigation: React.FC = () => {
                     setMobileMenuOpen(false);
                   }}
                   disabled={loading}
-                  className="btn-secondary w-full"
+                  className="btn-primary w-full"
                 >
-                  {loading ? 'Connecting...' : 'Connect Wallet'}
+                  {loading ? 'Connecting...' : 'Connect to MetaMask'}
                 </button>
               )}
             </div>

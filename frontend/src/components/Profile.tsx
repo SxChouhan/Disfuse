@@ -15,7 +15,7 @@ interface ProfileData {
 const Profile: React.FC<ProfileProps> = ({ address }) => {
   const { account, socialMediaContract, isConnected } = useWeb3();
   const { fetchData, uploadProfile, getGatewayURL } = useIPFS();
-  
+
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,13 +23,13 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [followerCount, setFollowerCount] = useState<number>(0);
   const [followingCount, setFollowingCount] = useState<number>(0);
-  
+
   // Edit form state
   const [username, setUsername] = useState<string>('');
   const [bio, setBio] = useState<string>('');
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState<string | null>(null);
-  
+
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -48,26 +48,26 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
         setLoading(false);
         return;
       }
-      
+
       try {
         setLoading(true);
-        
+
         const profile = await socialMediaContract.getProfile(profileAddress);
         setFollowerCount(profile.followerCount.toNumber());
         setFollowingCount(profile.followingCount.toNumber());
-        
+
         // Check if current user is following this profile
         if (account && !isOwnProfile) {
           const following = await socialMediaContract.isFollowing(account, profileAddress);
           setIsFollowing(following);
         }
-        
+
         // If profile has IPFS data, fetch it
         if (profile.profilePictureIpfsHash) {
           try {
             const data = await fetchData(profile.profilePictureIpfsHash);
             setProfileData(data);
-            
+
             // Initialize edit form
             setUsername(data.username || '');
             setBio(data.bio || '');
@@ -103,7 +103,7 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setProfilePicture(file);
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onload = () => {
@@ -119,26 +119,26 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
       setSubmitError('Please connect your wallet first');
       return;
     }
-    
+
     if (!username.trim()) {
       setSubmitError('Username is required');
       return;
     }
-    
+
     setIsSubmitting(true);
     setSubmitError(null);
-    
+
     try {
       // Upload profile data to IPFS
       const ipfsHash = await uploadProfile(username, bio, profilePicture || undefined);
-      
+
       // Update profile on blockchain
       const tx = await socialMediaContract.updateProfile(username, bio, ipfsHash);
       await tx.wait();
-      
+
       // Update local state
       setIsEditing(false);
-      
+
       // Refresh profile data
       const data = await fetchData(ipfsHash);
       setProfileData(data);
@@ -156,26 +156,26 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
       setSubmitError('Please connect your wallet first');
       return;
     }
-    
+
     if (!username.trim()) {
       setSubmitError('Username is required');
       return;
     }
-    
+
     setIsSubmitting(true);
     setSubmitError(null);
-    
+
     try {
       // Upload profile data to IPFS
       const ipfsHash = await uploadProfile(username, bio, profilePicture || undefined);
-      
+
       // Create profile on blockchain
       const tx = await socialMediaContract.createProfile(username, bio, ipfsHash);
       await tx.wait();
-      
+
       // Update local state
       setIsEditing(false);
-      
+
       // Refresh profile data
       const data = await fetchData(ipfsHash);
       setProfileData(data);
@@ -192,7 +192,7 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
     if (!isConnected || !account || !socialMediaContract || !profileAddress) {
       return;
     }
-    
+
     try {
       if (isFollowing) {
         await socialMediaContract.unfollowUser(profileAddress);
@@ -246,14 +246,14 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
         <h2 className="text-xl font-bold mb-4 text-center">
           {profileData ? 'Edit Profile' : 'Create Profile'}
         </h2>
-        
+
         <div className="flex flex-col items-center mb-6">
           <div className="relative mb-4">
             <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-600 flex items-center justify-center">
               {profilePicturePreview ? (
-                <img 
-                  src={profilePicturePreview} 
-                  alt="Profile" 
+                <img
+                  src={profilePicturePreview}
+                  alt="Profile"
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -262,7 +262,7 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
                 </span>
               )}
             </div>
-            <label 
+            <label
               htmlFor="profile-picture"
               className="absolute bottom-0 right-0 bg-neonGreen text-darkBg rounded-full p-2 cursor-pointer"
             >
@@ -279,7 +279,7 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
             />
           </div>
         </div>
-        
+
         <div className="mb-4">
           <label className="block text-gray-400 mb-2">Username</label>
           <input
@@ -290,7 +290,7 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
             placeholder="Enter your username"
           />
         </div>
-        
+
         <div className="mb-6">
           <label className="block text-gray-400 mb-2">Bio</label>
           <textarea
@@ -301,13 +301,13 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
             placeholder="Tell us about yourself"
           />
         </div>
-        
+
         {submitError && (
           <div className="text-red-500 text-sm mb-4">
             {submitError}
           </div>
         )}
-        
+
         <div className="flex justify-end space-x-4">
           {profileData && (
             <button
@@ -318,7 +318,7 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
               Cancel
             </button>
           )}
-          
+
           <button
             className="btn-primary"
             onClick={profileData ? saveProfile : createProfile}
@@ -332,63 +332,51 @@ const Profile: React.FC<ProfileProps> = ({ address }) => {
   }
 
   return (
-    <div className="card">
-      <div className="flex flex-col items-center mb-6">
-        <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-600 flex items-center justify-center mb-4">
-          {profileData.profilePictureCid ? (
-            <img 
-              src={getGatewayURL(profileData.profilePictureCid)} 
-              alt={profileData.username} 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-4xl text-white">
-              {profileData.username.charAt(0).toUpperCase()}
-            </span>
-          )}
-        </div>
-        
+    <div>
+      <div className="flex flex-col">
         <h1 className="text-2xl font-bold mb-1">
           {profileData.username}
         </h1>
-        
+
         <div className="text-gray-400 mb-2">
           {profileAddress && formatAddress(profileAddress)}
         </div>
-        
+
         {profileData.bio && (
-          <p className="text-center text-gray-300 mb-4">
+          <p className="text-gray-300 mb-4">
             {profileData.bio}
           </p>
         )}
-        
+
         <div className="flex space-x-6 mb-4">
           <div className="text-center">
             <div className="font-bold">{followerCount}</div>
             <div className="text-gray-400 text-sm">Followers</div>
           </div>
-          
+
           <div className="text-center">
             <div className="font-bold">{followingCount}</div>
             <div className="text-gray-400 text-sm">Following</div>
           </div>
         </div>
-        
-        {isOwnProfile ? (
-          <button
-            className="btn-secondary"
-            onClick={() => setIsEditing(true)}
-          >
-            Edit Profile
-          </button>
-        ) : (
-          <button
-            className={isFollowing ? 'btn-secondary' : 'btn-primary'}
-            onClick={toggleFollow}
-          >
-            {isFollowing ? 'Unfollow' : 'Follow'}
-          </button>
-        )}
+
+        <div className="flex space-x-3">
+          {isOwnProfile ? (
+            <button
+              className="btn-secondary text-sm px-4 py-1"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit Profile
+            </button>
+          ) : (
+            <button
+              className={isFollowing ? 'btn-secondary text-sm px-4 py-1' : 'btn-primary text-sm px-4 py-1'}
+              onClick={toggleFollow}
+            >
+              {isFollowing ? 'Unfollow' : 'Follow'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

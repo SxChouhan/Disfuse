@@ -93,36 +93,18 @@ export const getProviderAndSigner = async () => {
     return { provider, signer };
   } catch (error) {
     console.error('Error getting provider and signer:', error);
-
-    // Return mock provider and signer for development
-    const mockProvider = {
-      getNetwork: () => Promise.resolve({ chainId: CORE_CHAIN_ID }),
-      getBlockNumber: () => Promise.resolve(1000000),
-    };
-
-    const mockSigner = {
-      getAddress: () => Promise.resolve('0x1234567890123456789012345678901234567890'),
-      signMessage: () => Promise.resolve('0xmocksignature'),
-      provider: mockProvider,
-    };
-
-    return {
-      provider: mockProvider as any,
-      signer: mockSigner as any
-    };
+    throw new Error('Failed to connect to MetaMask. Please try again.');
   }
 };
 
-// Get contract instances
+// Get contract instances with improved error handling
 export const getSocialMediaContract = async (signer: any) => {
   const socialMediaAddress = contractAddresses.SocialMedia;
 
-  if (!socialMediaAddress || socialMediaAddress === '0x0000000000000000000000000000000000000000') {
-    console.warn('SocialMedia contract address is not set or is a zero address. Using mock contract for development.');
-
-    // Return a mock contract for development/testing
+  // Create a simplified mock contract for development
+  const createMockContract = () => {
     return {
-      // Mock functions that return dummy data
+      // Basic mock functions for essential operations
       getTotalPosts: () => ({ toNumber: () => 3 }),
       getPost: (id: number) => ({
         id: { toNumber: () => id },
@@ -133,8 +115,8 @@ export const getSocialMediaContract = async (signer: any) => {
         commentCount: { toNumber: () => Math.floor(Math.random() * 20) },
         isActive: true
       }),
-      getProfile: () => ({
-        user: '0x1234567890123456789012345678901234567890',
+      getProfile: (address?: string) => ({
+        user: address || '0x1234567890123456789012345678901234567890',
         username: 'DemoUser',
         bio: 'This is a demo profile for testing',
         profilePictureIpfsHash: '',
@@ -142,41 +124,43 @@ export const getSocialMediaContract = async (signer: any) => {
         followingCount: { toNumber: () => 21 },
         isActive: true
       }),
-      // Mock functions that simulate transactions
-      createPost: () => ({ wait: async () => {} }),
-      likePost: () => ({ wait: async () => {} }),
-      unlikePost: () => ({ wait: async () => {} }),
-      addComment: () => ({ wait: async () => {} }),
-      followUser: () => ({ wait: async () => {} }),
-      unfollowUser: () => ({ wait: async () => {} }),
-      createProfile: () => ({ wait: async () => {} }),
-      updateProfile: () => ({ wait: async () => {} }),
-      // Mock view functions
-      hasLiked: () => false,
-      isFollowing: () => false
+      createPost: (ipfsHash: string) => ({
+        wait: async () => {
+          console.log(`Mock creating post with IPFS hash: ${ipfsHash}`);
+          await new Promise(resolve => setTimeout(resolve, 500));
+          return {};
+        }
+      }),
+      likePost: (postId: number) => ({
+        wait: async () => Promise.resolve({})
+      }),
+      unlikePost: (postId: number) => ({
+        wait: async () => Promise.resolve({})
+      }),
+      hasLiked: () => Math.random() > 0.5,
+      isFollowing: () => Math.random() > 0.5
     };
+  };
+
+  // If contract address is not set, use mock contract
+  if (!socialMediaAddress || socialMediaAddress === '0x0000000000000000000000000000000000000000') {
+    console.warn('SocialMedia contract address is not set. Using mock contract for development.');
+    return createMockContract();
   }
 
   try {
     // Create contract with ethers v6 API
-    return new ethers.Contract(socialMediaAddress, SocialMediaABI, signer);
+    const contract = new ethers.Contract(socialMediaAddress, SocialMediaABI, signer);
+    return contract;
   } catch (error) {
     console.error('Error creating contract:', error);
 
-    // Return mock contract as fallback
-    return {
-      getTotalPosts: () => ({ toNumber: () => 3 }),
-      getPost: (id: number) => ({
-        id: { toNumber: () => id },
-        creator: '0x1234567890123456789012345678901234567890',
-        ipfsHash: 'QmExample123456789',
-        timestamp: { toNumber: () => Math.floor(Date.now() / 1000) - 3600 * id },
-        likeCount: { toNumber: () => Math.floor(Math.random() * 100) },
-        commentCount: { toNumber: () => Math.floor(Math.random() * 20) },
-        isActive: true
-      }),
-      // Other mock functions...
-    };
+    if (import.meta.env.DEV) {
+      console.warn('Using mock contract in development mode');
+      return createMockContract();
+    }
+
+    throw new Error('Failed to connect to the blockchain contract');
   }
 };
 
