@@ -100,9 +100,9 @@ A decentralized social media platform built on CoreDAO (Core Chain), inspired by
 
 ## IPFS Storage Setup
 
-This project uses IPFS for decentralized storage via Web3.storage. To set up IPFS storage:
+This project uses IPFS for decentralized storage via Pinata. To set up IPFS storage:
 
-1. Create an account at [Web3.storage](https://web3.storage)
+1. Create an account at Pinata.cloud
 2. Generate an API token from your account dashboard
 3. Add the token to your frontend `.env` file as `VITE_WEB3_STORAGE_TOKEN`
 
@@ -116,3 +116,9 @@ The IPFS utility in `frontend/src/utils/ipfs.ts` handles:
 ## License
 
 MIT
+
+## DEployed Contract
+0x6eC270221117B53597aA603b3AC66904Cf2A0187
+
+![Transaction](https://github.com/user-attachments/assets/9e6c1906-e98d-4ff1-a32d-0264768b5a9a)
+
