@@ -117,8 +117,10 @@ The IPFS utility in `frontend/src/utils/ipfs.ts` handles:
 
 MIT
 
-## DEployed Contract
+## Deployed Contract
 0x6eC270221117B53597aA603b3AC66904Cf2A0187
+
+
 
 ![Transaction](https://github.com/user-attachments/assets/9e6c1906-e98d-4ff1-a32d-0264768b5a9a)
 
